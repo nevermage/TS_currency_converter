@@ -1,7 +1,6 @@
 import {fetchData} from "./apiClient";
 import {CurrencyRates} from "../types";
-import {InvalidCurrencyError} from "../errors/invalidCurrencyError";
-import {ApiUrlNotDefinedError} from "../errors/apiUrlNotDefinedError";
+import {InvalidCurrencyError, ApiUrlNotDefinedError, FetchingError, CurrencyConvertingError} from "../errors";
 
 export class CurrencyManager {
     #currencyRates: CurrencyRates = {};
@@ -9,13 +8,13 @@ export class CurrencyManager {
     private async fetchCurrencyRates(): Promise<void> {
         const url = process.env.API_URL;
         if (!url) {
-            throw new ApiUrlNotDefinedError();
+            throw new ApiUrlNotDefinedError('API url not defined');
         }
 
         try {
             this.#currencyRates = await fetchData(url);
         } catch (error) {
-            console.error("Failed to initialize currency rates:", error);
+            throw new FetchingError("Failed to initialize currency rates: " + error);
         }
     }
 
@@ -23,17 +22,21 @@ export class CurrencyManager {
         await this.fetchCurrencyRates();
 
         if (!(base in this.#currencyRates)) {
-            throw new InvalidCurrencyError(base);
+            throw new InvalidCurrencyError(`Invalid currency "${base}"`);
         }
         if (!(target in this.#currencyRates)) {
-            throw new InvalidCurrencyError(target);
+            throw new InvalidCurrencyError(`Invalid currency "${target}"`);
         }
 
         return this.#currencyRates[target] / this.#currencyRates[base];
     }
 
     async convert(amount: number, base: string, target: string): Promise<number> {
-        const rate = await this.getRate(base, target);
-        return amount * rate;
+        try {
+            const rate = await this.getRate(base, target);
+            return amount * rate;
+        } catch (e) {
+            throw new CurrencyConvertingError('Could not convert currency rate. Message: ' + e);
+        }
     }
 }

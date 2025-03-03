@@ -1,6 +1,6 @@
 export class FetchingError extends Error {
-    constructor(statusCode: number) {
-        super(`HTTP error! Status: ${statusCode}`);
+    constructor(message: string) {
+        super(message);
         this.name = 'FetchingError';
     }
 }

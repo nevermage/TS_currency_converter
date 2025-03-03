@@ -1,6 +1,6 @@
 export class ApiUrlNotDefinedError extends Error {
-    constructor() {
-        super('API url not defined');
+    constructor(message: string) {
+        super(message);
         this.name = 'ApiUrlNotDefinedError';
     }
 }

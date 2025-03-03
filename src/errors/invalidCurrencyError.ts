@@ -1,6 +1,6 @@
 export class InvalidCurrencyError extends Error {
-    constructor(currency: string) {
-        super(`Invalid currency "${currency}"`);
+    constructor(message: string) {
+        super(message);
         this.name = 'InvalidCurrencyError';
     }
 }

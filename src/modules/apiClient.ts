@@ -1,12 +1,12 @@
 import {CurrencyRates} from "../types";
-import {FetchingError} from "../errors/fetchingError";
+import {FetchingError} from "../errors";
 
 export async function fetchData(url: string): Promise<CurrencyRates> {
     try {
         const response: Response = await fetch(url);
 
         if (!response.ok) {
-            throw new FetchingError(response.status);
+            throw new FetchingError(`HTTP error! Status: ${response.status}`);
         }
 
         const data: { data: CurrencyRates } = await response.json();
